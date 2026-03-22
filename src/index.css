@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Bebas+Neue&display=swap');
+
+@theme {
+  --color-bakery-50: #f6efe1;
+  --color-bakery-100: #eadfc5;
+  --color-bakery-200: #dbca9f;
+  --color-bakery-300: #c6ac6f;
+  --color-bakery-400: #b18d45;
+  --color-bakery-500: #9c712c;
+  --color-bakery-600: #865b21;
+  --color-bakery-700: #70481c;
+  --color-bakery-800: #5b3917;
+  --color-bakery-900: #462a12;
+  --color-bakery-950: #2a1607;
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Bebas Neue", cursive;
+}
+
+:root {
+  background-color: #f6efe1;
+  color: #462a12;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Utilities */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #3a2316; /* Same as bakery-800 */
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #fdfaf7; /* Light creamy white */
+  border-radius: 10px;
+  border: 1px solid #3a2316;
+}
+
+.mask-fade-right {
+  mask-image: linear-gradient(to right, black 90%, transparent 100%);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
