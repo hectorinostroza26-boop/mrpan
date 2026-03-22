@@ -208,16 +208,23 @@ function AdminView({ recipes, onLogout }) {
   };
 
   const handleShareWhatsApp = (item) => {
-    const message = `¡Hola! Bienvenido a la Academia Mr. Pan \u{1F956}\u{1F468}\u{200D}\u{1F373}.
+    // Generar emojis en ejecución para evadir problemas de codificación ()
+    const e_pan = String.fromCodePoint(0x1F956);
+    const e_chef = String.fromCodePoint(0x1F468, 0x200D, 0x1F373);
+    const e_dedo = String.fromCodePoint(0x1F449);
+    const e_link = String.fromCodePoint(0x1F517);
+    const e_cel = String.fromCodePoint(0x1F4F1);
+
+    const message = `¡Hola! Bienvenido a la Academia Mr. Pan ${e_pan}${e_chef}.
     
 Aquí tienes tu clave de acceso exclusiva para Mr. Pan App:
-\u{1F449} *${item.code}*
+${e_dedo} *${item.code}*
 
 Puedes ver todo el catálogo en versión Web aquí:
-\u{1F517} https://mrpan-admin.onrender.com/
+${e_link} https://mrpan-admin.onrender.com/
 
 Si prefieres usar la App en tu celular Android, descarga el archivo instalador (.apk) directamente desde aquí:
-\u{1F4F1} https://mrpan-admin.onrender.com/Academia-MRPAN.apk
+${e_cel} https://mrpan-admin.onrender.com/Academia-MRPAN.apk
 
 _*(Nota de seguridad: Al instalarla, tu teléfono puede mostrar un aviso diciendo 'archivo peligroso' o 'desarrollador no reconocido'; ignóralo marcando 'Instalar de todas formas'. Es solo porque aún no la hemos publicado en Google Play, pero la App es 100% segura y privada)*_.
 
