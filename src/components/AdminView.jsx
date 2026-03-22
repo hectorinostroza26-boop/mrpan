@@ -154,6 +154,7 @@ function AdminView({ recipes, onLogout }) {
 
   // Dynamic Handlers
   const addIngredient = () => setFormData({...formData, ingredients: [...formData.ingredients, '']});
+  const addIngredientGroup = () => setFormData({...formData, ingredients: [...formData.ingredients, '[G] ']});
   const updateIngredient = (index, value) => {
     const newIngs = [...formData.ingredients];
     newIngs[index] = value;
@@ -162,6 +163,7 @@ function AdminView({ recipes, onLogout }) {
   const removeIngredient = (index) => setFormData({...formData, ingredients: formData.ingredients.filter((_, i) => i !== index)});
 
   const addStep = () => setFormData({...formData, preparation: [...formData.preparation, '']});
+  const addStepGroup = () => setFormData({...formData, preparation: [...formData.preparation, '[G] ']});
   const updateStep = (index, value) => {
     const newSteps = [...formData.preparation];
     newSteps[index] = value;
@@ -369,31 +371,62 @@ function AdminView({ recipes, onLogout }) {
                  <div>
                     <label className="text-[10px] font-black text-bakery-400 uppercase tracking-widest block mb-4 flex justify-between items-center pr-2">
                        <span>Materiales / Pesaje</span>
-                       <button onClick={addIngredient} className="text-bakery-900 border-b-2 border-bakery-900 text-[9px]">+ Añadir</button>
+                        <div className="flex gap-3">
+                           <button onClick={addIngredientGroup} className="text-bakery-500 border-b-2 border-bakery-200 text-[9px] hover:text-bakery-900 transition-colors uppercase font-black">+ Grupo</button>
+                           <button onClick={addIngredient} className="text-bakery-900 border-b-2 border-bakery-900 text-[9px] hover:bg-bakery-50 transition-colors uppercase font-black">+ Material</button>
+                        </div>
                     </label>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                       {formData.ingredients.map((ing, i) => (
-                         <div key={i} className="flex gap-2">
-                            <input type="text" value={ing} onChange={e => updateIngredient(i, e.target.value)} placeholder="Ej: 1kg Harina Blanca" className="flex-1 px-5 py-4 rounded-2xl bg-bakery-50 border border-bakery-100 font-medium text-sm" />
-                            <button onClick={() => removeIngredient(i)} className="p-2 text-red-100 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                         </div>
-                       ))}
+                       {formData.ingredients.map((ing, i) => {
+                         const isGroup = ing.startsWith('[G]');
+                         return (
+                           <div key={i} className="flex gap-2">
+                              <input 
+                                type="text" 
+                                value={ing} 
+                                onChange={e => updateIngredient(i, e.target.value)} 
+                                placeholder={isGroup ? "[G] NOMBRE SECCION" : "Ej: 1kg Harina Blanca"} 
+                                className={`flex-1 px-5 py-4 rounded-2xl border transition-all ${
+                                  isGroup 
+                                    ? 'bg-bakery-900 text-white font-black text-[10px] uppercase tracking-widest border-bakery-900' 
+                                    : 'bg-bakery-50 border-bakery-100 font-medium text-sm text-bakery-900'
+                                }`} 
+                              />
+                              <button onClick={() => removeIngredient(i)} className={`p-2 transition-colors ${isGroup ? 'text-white/40 hover:text-white' : 'text-red-100 hover:text-red-500'}`}><Trash2 className="w-4 h-4" /></button>
+                           </div>
+                         );
+                       })}
                     </div>
                  </div>
 
                  <div>
                     <label className="text-[10px] font-black text-bakery-400 uppercase tracking-widest block mb-4 flex justify-between items-center pr-2">
                        <span>Preparación (Pasos)</span>
-                       <button onClick={addStep} className="text-bakery-900 border-b-2 border-bakery-900 text-[9px]">+ Añadir</button>
+                        <div className="flex gap-3">
+                           <button onClick={addStepGroup} className="text-bakery-500 border-b-2 border-bakery-200 text-[9px] hover:text-bakery-900 transition-colors uppercase font-black">+ Grupo</button>
+                           <button onClick={addStep} className="text-bakery-900 border-b-2 border-bakery-900 text-[9px] hover:bg-bakery-50 transition-colors uppercase font-black">+ Paso</button>
+                        </div>
                     </label>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8">
-                       {formData.preparation.map((step, i) => (
-                         <div key={i} className="flex gap-3 items-start relative bg-bakery-50/50 p-4 rounded-3xl border border-bakery-50">
-                            <span className="w-7 h-7 rounded-full bg-bakery-900 text-white text-[9px] flex items-center justify-center shrink-0 font-black shadow-lg">{i+1}</span>
-                            <textarea value={step} onChange={e => updateStep(i, e.target.value)} className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-xs min-h-[80px] resize-none" />
-                            <button onClick={() => removeStep(i)} className="p-2 text-red-100 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
-                         </div>
-                       ))}
+                       {formData.preparation.map((step, i) => {
+                         const isGroup = step.startsWith('[G]');
+                         return (
+                           <div key={i} className={`flex gap-3 items-start relative p-4 rounded-3xl border transition-all ${
+                             isGroup ? 'bg-bakery-950 border-bakery-950 col-span-full' : 'bg-bakery-50/50 border-bakery-50'
+                           }`}>
+                              {!isGroup && <span className="w-7 h-7 rounded-full bg-bakery-900 text-white text-[9px] flex items-center justify-center shrink-0 font-black shadow-lg">{i+1}</span>}
+                              <textarea 
+                                value={step} 
+                                onChange={e => updateStep(i, e.target.value)} 
+                                placeholder={isGroup ? "[G] PASOS PARA..." : "Escribe el paso..."}
+                                className={`flex-1 bg-transparent border-none focus:ring-0 font-medium text-xs min-h-[40px] resize-none ${
+                                  isGroup ? 'text-white font-black uppercase tracking-widest pt-1' : 'text-bakery-900'
+                                }`} 
+                              />
+                              <button onClick={() => removeStep(i)} className={`p-2 transition-colors ${isGroup ? 'text-white/40 hover:text-white' : 'text-red-100 hover:text-red-400'}`}><Trash2 className="w-4 h-4" /></button>
+                           </div>
+                         );
+                       })}
                     </div>
                  </div>
 

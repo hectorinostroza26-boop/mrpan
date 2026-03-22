@@ -114,15 +114,26 @@ function RecipeDetailView({ recipe, onBack }) {
                  <div className="bg-white/40 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/40 shadow-xl">
                     <h3 className="text-2xl font-display text-bakery-900 mb-6 flex items-center gap-3 uppercase">
                       <ListChecks className="w-6 h-6 text-bakery-600" />
-                      Ingredientes
+                      Ingredientes / Materiales
                     </h3>
                     <ul className="space-y-4">
-                      {recipe.ingredients.map((ing, i) => (
-                        <li key={i} className="flex gap-4 text-bakery-800 leading-relaxed group">
-                          <span className="w-1.5 h-1.5 rounded-full bg-bakery-400 mt-2.5 shrink-0 group-hover:scale-150 transition-transform"></span>
-                          <span className="text-lg font-medium">{ing}</span>
-                        </li>
-                      ))}
+                      {recipe.ingredients.map((ing, i) => {
+                        const isGroup = ing.startsWith('[G]');
+                        if (isGroup) {
+                          return (
+                            <li key={i} className="pt-8 pb-3 border-b-2 border-bakery-200/50 mb-4 first:pt-0 list-none">
+                              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-bakery-400 block mb-1">Sección</span>
+                              <span className="text-3xl font-display text-bakery-900 uppercase leading-none">{ing.replace('[G]', '').trim()}</span>
+                            </li>
+                          );
+                        }
+                        return (
+                          <li key={i} className="flex gap-4 text-bakery-800 leading-relaxed group px-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-bakery-400 mt-2.5 shrink-0 group-hover:scale-150 transition-transform"></span>
+                            <span className="text-lg font-medium">{ing}</span>
+                          </li>
+                        );
+                      })}
                     </ul>
                  </div>
 
@@ -132,16 +143,27 @@ function RecipeDetailView({ recipe, onBack }) {
                       Preparación
                     </h3>
                     <div className="space-y-8">
-                      {recipe.preparation.map((step, index) => (
-                        <div key={index} className="flex gap-6 group">
-                          <span className="font-display text-5xl text-bakery-200/80 group-hover:text-bakery-400 transition-colors tabular-nums shrink-0 leading-none">
-                            {(index + 1).toString().padStart(2, '0')}
-                          </span>
-                          <p className="text-bakery-800 leading-relaxed font-medium">
-                            {step}
-                          </p>
-                        </div>
-                      ))}
+                      {recipe.preparation.map((step, index) => {
+                        const isGroup = step.startsWith('[G]');
+                        if (isGroup) {
+                          return (
+                            <div key={index} className="pt-8 pb-4 border-b-2 border-bakery-200/30 mb-2 first:pt-0">
+                               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-bakery-400 block mb-2">Proceso</span>
+                               <h4 className="text-2xl font-display text-bakery-900 uppercase leading-none">{step.replace('[G]', '').trim()}</h4>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={index} className="flex gap-6 group">
+                            <span className="font-display text-5xl text-bakery-200/80 group-hover:text-bakery-400 transition-colors tabular-nums shrink-0 leading-none">
+                              {(index + 1).toString().padStart(2, '0')}
+                            </span>
+                            <p className="text-bakery-800 leading-relaxed font-medium pt-1">
+                              {step}
+                            </p>
+                          </div>
+                        );
+                      })}
                     </div>
                  </div>
               </div>
