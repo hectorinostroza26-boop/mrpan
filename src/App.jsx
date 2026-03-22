@@ -59,6 +59,13 @@ function App() {
   const handleActivate = async (code = '') => {
     const inputCode = code.toUpperCase().trim();
     
+    // Generar un ID único para este aparato si no existe
+    let deviceId = localStorage.getItem('mrpan_device_id');
+    if (!deviceId) {
+      deviceId = Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('mrpan_device_id', deviceId);
+    }
+
     // Admin Override
     if (inputCode === 'ADMIN-MRPAN') {
       localStorage.setItem('mrpan_auth', 'activated');
@@ -82,31 +89,64 @@ function App() {
         return false;
       }
 
-      if (data.status === 'activado' || data.status === 'activo') {
-        alert('Este código ya ha sido utilizado en otro dispositivo. Si es tu cuenta, contacta a soporte para recuperación.');
-        return false;
+      // Analizar dispositivos autorizados en el campo status
+      // El formato de status será: "activado|ID1|ID2"
+      const statusParts = data.status ? data.status.split('|') : ['disponible'];
+      const currentStatus = statusParts[0];
+      const authorizedIds = statusParts.slice(1);
+
+      if (currentStatus === 'activado' || currentStatus === 'activo') {
+        // ¿Ya estamos autorizados en este aparato?
+        if (authorizedIds.includes(deviceId)) {
+           // Si ya está registrado este ID, entramos directo (re-login)
+        } else {
+           // Es un aparato NUEVO. Pedimos correo para verificar identidad
+           const verifyEmail = prompt('Esta clave ya fue activada en otro dispositivo. Para reactivarla en este nuevo equipo, por favor ingresa el correo registrado del alumno:');
+           
+           if (!verifyEmail || verifyEmail.toLowerCase().trim() !== data.email.toLowerCase().trim()) {
+             alert('El correo no coincide con el registro original de este código.');
+             return false;
+           }
+
+           // ¿Tenemos hueco para un segundo dispositivo?
+           if (authorizedIds.length >= 2) {
+             alert('Límite de dispositivos alcanzado (Máximo 2 equipos por alumno). Por favor contacta a soporte para liberar un cupo.');
+             return false;
+           }
+
+           // Registramos el nuevo ID de dispositivo
+           const newStatus = `${data.status}|${deviceId}`;
+           const { error: updateError } = await supabase
+             .from('activation_codes')
+             .update({ status: newStatus })
+             .match({ id: data.id });
+           
+           if (updateError) throw updateError;
+        }
+      } else {
+        // Primera activación total (Dispositivo 1)
+        const { error: updateError } = await supabase
+          .from('activation_codes')
+          .update({ 
+            status: `activado|${deviceId}`,
+            activated_at: new Date().toISOString()
+          })
+          .match({ id: data.id });
+
+        if (updateError) throw updateError;
       }
 
-      // Proccess Activation
-      const { error: updateError } = await supabase
-        .from('activation_codes')
-        .update({ 
-          status: 'activado',
-          activated_at: new Date().toISOString()
-        })
-        .match({ id: data.id });
-
-      if (updateError) throw updateError;
-
+      // Proceso de entrada exitoso
       localStorage.setItem('mrpan_auth', 'activated');
       localStorage.setItem('mrpan_role', 'user');
       setIsAuthorized(true);
       setRole('user');
       setView('catalog');
       return true;
+
     } catch (err) {
       console.error('Activation error:', err);
-      alert('Error de conexión. Intenta nuevamente.');
+      alert('Error de conexión o validación. Intenta nuevamente.');
       return false;
     }
   };

@@ -16,7 +16,9 @@ import {
   Edit2,
   UserCheck,
   Mail,
-  LockOpen
+  LockOpen,
+  Copy,
+  Send
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
@@ -200,6 +202,30 @@ function AdminView({ recipes, onLogout }) {
     }
   };
 
+  const handleCopyCode = (code) => {
+    navigator.clipboard.writeText(code);
+    alert('Clave ' + code + ' copiada al portapapeles');
+  };
+
+  const handleShareWhatsApp = (item) => {
+    const message = `¡Hola! Bienvenido a la Academia Mr. Pan 🥖👨‍🍳.
+    
+Aquí tienes tu clave de acceso exclusiva para Mr. Pan App:
+👉 *${item.code}*
+
+Puedes ver todo el catálogo en versión Web aquí:
+🔗 https://mrpan-admin.onrender.com/
+
+Si prefieres usar la App en tu celular Android, descarga el archivo instalador (.apk) directamente desde aquí:
+📱 https://mrpan-admin.onrender.com/Academia-MRPAN.apk
+
+_*(Nota de seguridad: Al instalarla, tu teléfono puede mostrar un aviso diciendo 'archivo peligroso' o 'desarrollador no reconocido'; ignóralo marcando 'Instalar de todas formas'. Es solo porque aún no la hemos publicado en Google Play, pero la App es 100% segura y privada)*_.
+
+¡Nos vemos en el taller!`;
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  };
+
   return (
     <div className="flex flex-col min-h-full">
       <div className="flex items-center justify-between mb-8">
@@ -283,24 +309,43 @@ function AdminView({ recipes, onLogout }) {
                              <Mail className="w-2.5 h-2.5" /> {item.email}
                           </span>
                        </div>
-                       {item.status === 'activado' ? (
-                         <div className="flex items-center gap-2">
-                           <div className="px-4 py-2 rounded-full text-[8px] font-black uppercase tracking-widest bg-green-50 text-green-600 border border-green-100">
-                              Activado
-                           </div>
-                           <button 
-                             onClick={() => handleResetAccess(item.id)}
-                             className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-100 transition-colors"
-                             title="Liberar Acceso"
-                           >
-                             <LockOpen className="w-3 h-3" />
-                           </button>
-                         </div>
-                       ) : (
-                         <div className="px-4 py-2 rounded-full text-[8px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100">
-                            {item.status}
-                         </div>
-                       )}
+                       
+                       <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => handleCopyCode(item.code)}
+                            className="p-3 rounded-2xl bg-bakery-50 text-bakery-400 hover:text-bakery-900 transition-colors"
+                            title="Copiar Clave"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          
+                          <button 
+                            onClick={() => handleShareWhatsApp(item)}
+                            className="p-3 rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                            title="Enviar por WhatsApp"
+                          >
+                            <Send className="w-4 h-4" />
+                          </button>
+
+                          {item.status === 'activado' ? (
+                            <div className="flex items-center gap-2">
+                              <div className="px-4 py-2 rounded-full text-[8px] font-black uppercase tracking-widest bg-green-50 text-green-600 border border-green-100">
+                                Activado
+                              </div>
+                              <button 
+                                onClick={() => handleResetAccess(item.id)}
+                                className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-100 transition-colors"
+                                title="Liberar Acceso"
+                              >
+                                <LockOpen className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="px-4 py-2 rounded-full text-[8px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100">
+                               {item.status}
+                            </div>
+                          )}
+                       </div>
                     </div>
                   ))
                 )}
