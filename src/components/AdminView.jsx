@@ -208,16 +208,16 @@ function AdminView({ recipes, onLogout }) {
   };
 
   const handleShareWhatsApp = (item) => {
-    const message = `¡Hola! Bienvenido a la Academia Mr. Pan 🥖👨‍🍳.
+    const message = `¡Hola! Bienvenido a la Academia Mr. Pan \u{1F956}\u{1F468}\u{200D}\u{1F373}.
     
 Aquí tienes tu clave de acceso exclusiva para Mr. Pan App:
-👉 *${item.code}*
+\u{1F449} *${item.code}*
 
 Puedes ver todo el catálogo en versión Web aquí:
-🔗 https://mrpan-admin.onrender.com/
+\u{1F517} https://mrpan-admin.onrender.com/
 
 Si prefieres usar la App en tu celular Android, descarga el archivo instalador (.apk) directamente desde aquí:
-📱 https://mrpan-admin.onrender.com/Academia-MRPAN.apk
+\u{1F4F1} https://mrpan-admin.onrender.com/Academia-MRPAN.apk
 
 _*(Nota de seguridad: Al instalarla, tu teléfono puede mostrar un aviso diciendo 'archivo peligroso' o 'desarrollador no reconocido'; ignóralo marcando 'Instalar de todas formas'. Es solo porque aún no la hemos publicado en Google Play, pero la App es 100% segura y privada)*_.
 
