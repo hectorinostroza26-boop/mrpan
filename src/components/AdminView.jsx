@@ -18,7 +18,8 @@ import {
   Mail,
   LockOpen,
   Copy,
-  Send
+  Send,
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
@@ -26,6 +27,7 @@ import { recipes as mockRecipes } from '../data/recipes';
 
 function AdminView({ recipes, onLogout }) {
   const [activeTab, setActiveTab] = useState('recipes'); // 'recipes' or 'users'
+  const [filterReady, setFilterReady] = useState('all'); // 'all', 'ready', 'pending'
   const [isAddingRecipe, setIsAddingRecipe] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -128,6 +130,30 @@ function AdminView({ recipes, onLogout }) {
       alert('Error: ' + error.message);
     }
   };
+
+  const handleToggleReady = async (recipe) => {
+    try {
+      const isReady = recipe.percentages?._reviewed || false;
+      const updatedPercentages = { ...recipe.percentages, _reviewed: !isReady };
+      
+      const { error } = await supabase
+        .from('recipes')
+        .update({ percentages: updatedPercentages })
+        .match({ id: recipe.id });
+        
+      if (error) throw error;
+      window.location.reload();
+    } catch (err) {
+      alert('Error al actualizar estado: ' + err.message);
+    }
+  };
+
+  const filteredRecipes = recipes.filter(r => {
+    const isReady = r.percentages?._reviewed || false;
+    if (filterReady === 'ready') return isReady;
+    if (filterReady === 'pending') return !isReady;
+    return true;
+  });
 
   const handleEdit = (recipe) => {
     setFormData(recipe);
@@ -252,6 +278,15 @@ _*(Nota de seguridad: Al instalarla, tu teléfono puede mostrar un aviso diciend
                       <span className="text-[8px] font-black text-bakery-400 uppercase tracking-widest mt-1">Recetas</span>
                   </div>
                   <div className="flex gap-2">
+                    <select 
+                      value={filterReady}
+                      onChange={(e) => setFilterReady(e.target.value)}
+                      className="bg-bakery-50 border border-bakery-100 text-bakery-900 text-[10px] font-bold uppercase tracking-widest rounded-2xl px-3 outline-none"
+                    >
+                      <option value="all">Todas</option>
+                      <option value="ready">Listas ✅</option>
+                      <option value="pending">Por Revisar ⏳</option>
+                    </select>
                     <button onClick={handleImportAll} className="bg-bakery-50 text-bakery-900 px-5 py-3 rounded-2xl text-[8px] font-black uppercase tracking-widest border border-bakery-100">
                       {isImporting ? <Loader2 className="w-3 h-3 animate-spin"/> : 'Migrar BASE'}
                     </button>
@@ -262,21 +297,29 @@ _*(Nota de seguridad: Al instalarla, tu teléfono puede mostrar un aviso diciend
              </div>
 
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {recipes.map(recipe => (
-                  <div key={recipe.id} className="bg-white p-4 rounded-3xl border border-bakery-100 shadow-sm flex items-center justify-between group hover:border-bakery-900 transition-colors">
+                {filteredRecipes.map(recipe => {
+                  const isReady = recipe.percentages?._reviewed || false;
+                  return (
+                  <div key={recipe.id} className={`bg-white p-4 rounded-3xl border ${isReady ? 'border-green-500/50 bg-green-50/10' : 'border-bakery-100'} shadow-sm flex items-center justify-between group hover:border-bakery-900 transition-colors`}>
                      <div className="flex items-center gap-4">
-                        <img src={recipe.image} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                        <div className="relative">
+                          <img src={recipe.image} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                          {isReady && <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1 shadow-md"><CheckCircle2 className="w-3 h-3" /></div>}
+                        </div>
                         <div>
-                           <h3 className="font-display text-xl text-bakery-900 leading-none uppercase">{recipe.name}</h3>
+                           <h3 className="font-display text-xl text-bakery-900 leading-none uppercase pr-2">{recipe.name}</h3>
                            <span className="text-[8px] font-bold text-bakery-400 uppercase tracking-widest mt-1 inline-block">{recipe.category}</span>
                         </div>
                      </div>
                      <div className="flex gap-1">
+                        <button onClick={() => handleToggleReady(recipe)} className={`p-3 transition-colors ${isReady ? 'text-green-500 hover:text-green-600' : 'text-bakery-200 hover:text-green-500'}`} title={isReady ? 'Marcar como pendiente' : 'Marcar como revisada'}>
+                          <CheckCircle2 className="w-5 h-5" />
+                        </button>
                         <button onClick={() => handleEdit(recipe)} className="p-3 text-bakery-300 hover:text-bakery-900"><Edit2 className="w-5 h-5" /></button>
                         <button onClick={() => handleDelete(recipe.id, recipe.name)} className="p-3 text-red-200 hover:text-red-500"><Trash2 className="w-5 h-5" /></button>
                      </div>
                   </div>
-                ))}
+                )})}
              </div>
           </motion.div>
         ) : (
