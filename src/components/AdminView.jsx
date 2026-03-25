@@ -239,6 +239,8 @@ function AdminView({ recipes, onLogout }) {
 Aquí tienes tu clave de acceso exclusiva para Mr. Pan App:
 - *${item.code}*
 
+⚠️ *IMPORTANTE:* Esta clave es única e intransferible. Su activación te permite usarla en la App y en la versión Web únicamente para ti. Queda enlazada permanentemente a tus equipos; si se intenta usar o compartir en otros dispositivos, el acceso se bloqueará automáticamente.
+
 Puedes ver todo el catálogo en versión Web aquí:
 - https://mrpan-admin.onrender.com/
 
