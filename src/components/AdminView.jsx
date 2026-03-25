@@ -370,10 +370,10 @@ _*(Nota de seguridad: Al instalarla, tu teléfono puede mostrar un aviso diciend
                             <Send className="w-4 h-4" />
                           </button>
 
-                          {item.status === 'activado' ? (
+                          {item.status && item.status.startsWith('activado') ? (
                             <div className="flex items-center gap-2">
-                              <div className="px-4 py-2 rounded-full text-[8px] font-black uppercase tracking-widest bg-green-50 text-green-600 border border-green-100">
-                                Activado
+                              <div className="px-4 py-2 rounded-full text-[8px] font-black uppercase tracking-widest bg-green-50 text-green-600 border border-green-100" title={item.status.includes('|') ? `Equipos: ${item.status.split('|').slice(1).join(', ')}` : ''}>
+                                Activado {item.status.includes('|') ? `(${item.status.split('|').length - 1}/2)` : ''}
                               </div>
                               <button 
                                 onClick={() => handleResetAccess(item.id)}
